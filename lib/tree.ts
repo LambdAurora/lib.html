@@ -35,7 +35,7 @@ export abstract class Node {
 	 *
 	 * @returns the representation of this node for JSON-serialization
 	 */
-	public abstract to_json(): object | string;
+	public abstract toJSON(): object | string;
 
 	/**
 	 * Clones this node.

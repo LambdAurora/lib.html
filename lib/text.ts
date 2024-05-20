@@ -60,7 +60,7 @@ export class Text extends Node {
 	 *
 	 * @returns the representation of this text node for JSON-serialization
 	 */
-	public override to_json(): string {
+	public override toJSON(): string {
 		return this.content;
 	}
 
@@ -119,7 +119,7 @@ export class Comment extends Node {
 	 *
 	 * @returns the representation of this comment node for JSON-serialization
 	 */
-	public override to_json(): object {
+	public override toJSON(): object {
 		return {
 			type: "comment",
 			content: this.content,

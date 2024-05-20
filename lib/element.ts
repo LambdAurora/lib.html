@@ -693,12 +693,12 @@ export class Element extends Node {
 	 *
 	 * @returns the representation of this element for JSON-serialization
 	 */
-	public override to_json(): object {
+	public override toJSON(): object {
 		return {
 			type: "tag",
 			tag: this.tag.name,
-			attributes: this.attributes.map(attr => attr.to_json()),
-			children: this.children.map(child => child.to_json()),
+			attributes: this.attributes.map(attr => attr.toJSON()),
+			children: this.children.map(child => child.toJSON()),
 		};
 	}
 

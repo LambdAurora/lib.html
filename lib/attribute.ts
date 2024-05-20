@@ -131,7 +131,7 @@ export abstract class Attribute<ValueType> {
 	 *
 	 * @returns the representation of this attribute for JSON-serialization
 	 */
-	public abstract to_json(): object;
+	public abstract toJSON(): object;
 
 	/**
 	 * Clones this attribute.
@@ -185,7 +185,7 @@ export class SimpleAttribute extends Attribute<string> {
 	 *
 	 * @returns the representation of this simple attribute for JSON-serialization
 	 */
-	public override to_json(): object {
+	public override toJSON(): object {
 		return {
 			type: "attribute",
 			name: this.name,
@@ -287,7 +287,7 @@ export class ClassAttribute extends Attribute<string[]> {
 	 *
 	 * @returns the representation of this `class` attribute for JSON-serialization
 	 */
-	public override to_json(): object {
+	public override toJSON(): object {
 		return {
 			type: "class_attribute",
 			name: this.name,
@@ -416,7 +416,7 @@ export class StyleAttribute extends Attribute<StyleAttributeValue> {
 	 *
 	 * @returns the representation of this `style` attribute for JSON-serialization
 	 */
-	public override to_json(): object {
+	public override toJSON(): object {
 		return {
 			type: "style_attribute",
 			name: this.name,
