@@ -8,7 +8,7 @@
 </p>
 
 <p align="center">
-	A HTML AST, parser, and writer library written in TypeScript.
+	An HTML AST, parser, and writer library written in TypeScript.
 </p>
 
 ## Example
