@@ -93,7 +93,7 @@ type TagName = { name: string };
  */
 export function sanitize_elements<I extends (Node | Node[])>(
 	element: I,
-	disallowed_tags: (string | TagName)[],
+	disallowed_tags: readonly (string | TagName)[],
 	extra = (node: Node) => node
 ): I {
 	const tags_to_remove = disallowed_tags.map(tag => typeof tag === "string" ? tag : tag.name) as string[];

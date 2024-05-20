@@ -32,6 +32,8 @@ jobs:
         with:
           name: Artifacts
           path: |
+            README.md
+            CHANGELOG.md
             LICENSE
             mod.ts
             lib/

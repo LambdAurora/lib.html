@@ -26,7 +26,7 @@ export interface TagData<El extends Element> {
 	/**
 	 * Attributes that are required.
 	 */
-	required_attributes: string[] | Readonly<string[]>;
+	required_attributes: readonly string[];
 	/**
 	 * `true` if an element with this tag can be closed in its opening statement, or `false` otherwise.
 	 */
@@ -66,24 +66,22 @@ export interface NamedTagData<El extends Element> extends TagData<El> {
 	name: string;
 }
 
-function make_tag<El extends Element>(name: string, options: Partial<TagData<El>> = {}): NamedTagData<El> {
-	const complete_options = Object.freeze(
-		merge_objects({
-			required_attributes: Object.freeze([]),
-			self_closing: false,
-			parse_inside: true,
-			escape_inside: true,
-			preserve_format: false,
-			inline: true,
-			create: function () {
-				return new Element(this as NamedTagData<El>) as El;
-			}
-		}, options)
-	);
-	return {
+function make_tag<El extends Element>(name: string, options: Partial<TagData<El>> = {}): Readonly<NamedTagData<El>> {
+	const complete_options = merge_objects({
+		required_attributes: Object.freeze([]),
+		self_closing: false,
+		parse_inside: true,
+		escape_inside: true,
+		preserve_format: false,
+		inline: true,
+		create: function () {
+			return new Element(this as NamedTagData<El>) as El;
+		}
+	}, options);
+	return Object.freeze({
 		name: name,
 		...complete_options
-	};
+	});
 }
 
 /**
@@ -92,7 +90,7 @@ function make_tag<El extends Element>(name: string, options: Partial<TagData<El>
  * @version 1.0.0
  * @since 1.0.0
  */
-export const Tag: Readonly<{ [key: string]: NamedTagData<Element> }> = Object.freeze({
+export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> = Object.freeze({
 	"!doctype": make_tag("!DOCTYPE", {self_closing: true}),
 	a: make_tag("a", {create: () => new LinkElement()}),
 	abbr: make_tag("abbr"),

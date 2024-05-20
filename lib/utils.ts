@@ -24,11 +24,11 @@ const SPACES = [" ", "\t", "\r", "\n"];
 /**
  * Represents the HTML tag start (`<`) code point.
  */
-export const TAG_START_CODE_POINT: number = "<".codePointAt(0) as number;
+export const TAG_START_CODE_POINT: number = "<".codePointAt(0)!;
 /**
  * Represents the HTML tag end (`>`) code point.
  */
-export const TAG_END_CODE_POINT: number = ">".codePointAt(0) as number;
+export const TAG_END_CODE_POINT: number = ">".codePointAt(0)!;
 
 /*
  * Object stuff
