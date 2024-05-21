@@ -9,7 +9,7 @@ const p = html.create_element("p")
 	.with_child(" Stuff is strange");
 
 Deno.test("html/output/proper_wrapping", () => {
-	assertEquals(p.html(), `<p>${screaming}<a>test link</a>. Hello World!\n\tStuff is strange</p>`);
+	assertEquals(p.html(), `<p>\n\t${screaming}<a>test link</a>. Hello World!\n\tStuff is strange\n</p>`);
 });
 
 Deno.test("html/output/proper_ugly", () => {

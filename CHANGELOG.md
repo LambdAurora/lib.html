@@ -11,3 +11,7 @@
 ### 1.0.2
 
 - Fix JSON stringification integration.
+
+### 1.0.3
+
+- Fix wrong insertion of significant whitespaces in stringification.

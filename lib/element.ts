@@ -539,7 +539,21 @@ export class Element extends Node {
 			if (child instanceof Text) {
 				return child;
 			} else if (child instanceof Element) {
-				break;
+				return child.get_first_relevant_text_child();
+			}
+		}
+
+		return undefined;
+	}
+
+	private get_last_relevant_text_child(): Text | undefined {
+		for (let i = this.children.length - 1; i >= 0; i--) {
+			const child = this.children[i];
+
+			if (child instanceof Text) {
+				return child;
+			} else if (child instanceof Element) {
+				return child.get_last_relevant_text_child();
 			}
 		}
 
@@ -573,13 +587,20 @@ export class Element extends Node {
 				const indent = pretty ? style.indent() : new StringifyStyle("");
 
 				if (pretty) {
-					const relevant_child = this.get_first_relevant_text_child();
-
-					if (
-						relevant_child?.content === undefined
-						|| get_leading_spaces(relevant_child.content) !== 0
-					) {
+					if (!this.tag.inline) {
+						// This element isn't an inline element, we can freely use new lines.
 						result += "\n";
+					} else {
+						// Otherwise we look for the first relevant text child and see if it has leading spaces,
+						// if it does then we can insert a new line without altering the meaning of the HTML tree.
+						const relevant_child = this.get_first_relevant_text_child();
+
+						if (
+							relevant_child?.content === undefined
+							|| get_leading_spaces(relevant_child.content) !== 0
+						) {
+							result += "\n";
+						}
 					}
 				}
 
@@ -588,12 +609,19 @@ export class Element extends Node {
 				if (pretty) {
 					const trailing_spaces = get_trailing_spaces(result);
 
+					// If we have trailing spaces we can simplify them into a new line.
 					if (trailing_spaces) {
-						result = result.substring(0, result.length - trailing_spaces);
-					}
-
-					if (trailing_spaces || this.children[this.children.length - 1] instanceof Element) {
+						result = result.substring(0, result.length - trailing_spaces) + `\n${style.indent_value}`;
+					} else if (!this.tag.inline) {
+						// Or if this element isn't an inline element, then we can put the end tag on a new line.
 						result += `\n${style.indent_value}`;
+					} else {
+						// Otherwise we look if there's a relevant text child that has trailing spaces to determine if we can have a new line.
+						const last_text = this.get_last_relevant_text_child();
+
+						if (last_text && get_trailing_spaces(last_text.content)) {
+							result += `\n${style.indent_value}`;
+						}
 					}
 				}
 			}
@@ -628,7 +656,7 @@ export class Element extends Node {
 				const starting_spaces = get_leading_spaces(child.content);
 				let html = child.html();
 
-				if (pretty && starting_spaces !== 0) {
+				if (pretty && ((!this.tag.inline && i === 0) || starting_spaces !== 0)) {
 					// If we prettify and the text has leading spaces, we can replace with indentation instead.
 					if (look_behind instanceof Text && !result.endsWith("\n")) {
 						// And in the case the previous node was also text, we make sure the new line is present as it could not be.
@@ -647,10 +675,14 @@ export class Element extends Node {
 					allow_element_indent = false;
 				}
 			} else if (child instanceof Element) {
+				const relevant_text = child.get_first_relevant_text_child();
 				const elem_html = child.html(style);
 
-				if (!allow_element_indent) result += elem_html.trimStart();
-				else result += elem_html;
+				if (!result.endsWith("\n") && this.tag.inline && relevant_text && get_leading_spaces(relevant_text.content) === 0) {
+					result += elem_html.trimStart();
+				} else if (!allow_element_indent) {
+					result += elem_html.trimStart();
+				} else result += elem_html;
 
 				if ((look_ahead instanceof Text && get_leading_spaces(look_ahead.content) !== 0) || !(look_ahead instanceof Text)) {
 					result += separator;
