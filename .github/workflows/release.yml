@@ -35,6 +35,7 @@ jobs:
             README.md
             CHANGELOG.md
             LICENSE
+            deno.json
             mod.ts
             lib/
             dist/
