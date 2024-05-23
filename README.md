@@ -57,5 +57,5 @@ import * as html from "@lambdaurora/libhtml";
 Import the library using [esm.sh](https://esm.sh):
 
 ```javascript
-import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.0.4";
+import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.1.0";
 ```
