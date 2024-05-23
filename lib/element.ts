@@ -685,7 +685,7 @@ export class Element extends Node {
 				} else if (!allow_element_indent) {
 					result += elem_html.trimStart();
 				} else {
-					if (pretty && !result.endsWith("\n")) {
+					if (pretty && i !== 0 && !result.endsWith("\n")) {
 						// If we prettify and indent the child element, we ensure that there's a new line for it.
 						result += "\n";
 					}

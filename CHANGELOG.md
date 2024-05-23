@@ -24,3 +24,7 @@
 
 - Added single HTML element parsing function `parse_element`.
 - Improved HTML stringification.
+
+### 1.1.1
+
+- Fixed HTML stringification inserting too many new lines.
