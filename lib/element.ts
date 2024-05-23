@@ -740,9 +740,8 @@ export class Element extends Node {
 	 * Clones the children of this element.
 	 *
 	 * @returns the cloned children of this element
-	 * @protected
 	 */
-	protected clone_children(): Node[] {
+	public clone_children(): Node[] {
 		const cloned = [];
 
 		for (const node of this.children) {

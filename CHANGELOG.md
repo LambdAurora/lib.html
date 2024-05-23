@@ -6,12 +6,16 @@
 
 ### 1.0.1
 
-- Improve some minor typing.
+- Improved some minor typing.
 
 ### 1.0.2
 
-- Fix JSON stringification integration.
+- Fixed JSON stringification integration.
 
 ### 1.0.3
 
-- Fix wrong insertion of significant whitespaces in stringification.
+- Fixed wrong insertion of significant whitespaces in stringification.
+
+### 1.0.4
+
+- Made `clone_children` public as it being protected was a mistake.

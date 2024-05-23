@@ -3,6 +3,7 @@
 <p align="center">
 	<img src="https://img.shields.io/badge/language-TS-9B599A.svg?style=flat-square" alt="JS" />
 	<a href="https://raw.githubusercontent.com/LambdAurora/lib.html/main/LICENSE"><img src="https://img.shields.io/badge/license-MPL%202.0-blue.svg?style=flat-square" alt="GitHub license" /></a>
+	<a href="https://jsr.io/@lambdaurora/libhtml"><img src="https://jsr.io/badges/@lambdaurora/libhtml?style=flat-square" alt="JSR badge" /></a>
 	<img src="https://shields.io/github/v/tag/LambdAurora/lib.html?sort=semver&style=flat-square" />
 	<a href="https://github.com/LambdAurora/lib.html/issues/"><img src="https://img.shields.io/github/issues/LambdAurora/lib.html.svg?style=flat-square" alt="GitHub issues" /></a>
 </p>
@@ -56,5 +57,5 @@ import * as html from "@lambdaurora/libhtml";
 Import the library using [esm.sh](https://esm.sh):
 
 ```javascript
-import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.0.3";
+import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.0.4";
 ```
