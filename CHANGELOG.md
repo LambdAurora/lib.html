@@ -19,3 +19,8 @@
 ### 1.0.4
 
 - Made `clone_children` public as it being protected was a mistake.
+
+## 1.1.0
+
+- Added single HTML element parsing function `parse_element`.
+- Improved HTML stringification.

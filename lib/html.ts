@@ -17,7 +17,7 @@
 import type { Node } from "./tree.ts";
 import { decode_html, TAG_END_CODE_POINT, TAG_START_CODE_POINT } from "./utils.ts";
 import { Comment, Text } from "./text.ts";
-import { create_element, Element, Tag } from "./element.ts";
+import { create_element, Element, make_tag } from "./element.ts";
 
 /*
  * Render
@@ -127,6 +127,8 @@ export function sanitize_elements<I extends (Node | Node[])>(
  * Parser
  */
 
+const END_TAG = make_tag("parse end");
+
 /**
  * Attempts to parse HTML nodes from a given HTML source.
  *
@@ -137,7 +139,7 @@ export function parse_nodes(source: string): Node[] {
 	const nodes: Node[] = [];
 
 	parse_html(source, {
-		tag: Tag.div,
+		tag: END_TAG,
 		append_child: (node: Node) => nodes.push(node)
 	} as unknown as Element);
 
@@ -157,6 +159,51 @@ export function parse(source: string, container: Element | null = null): Node {
 		return container;
 	} else
 		return parse_nodes(source)[0];
+}
+
+/**
+ * Represents the result of the parsing of an HTML element.
+ *
+ * @version 1.1.0
+ * @since 1.1.0
+ */
+export interface ElementParseResult {
+	/**
+	 * The parsed HTML element.
+	 */
+	element: Element;
+	/**
+	 * The length of the consumed source string by the parser.
+	 */
+	length: number;
+}
+
+/**
+ * Attempts to parse a single HTML element from the source string.
+ *
+ * @param source the source string
+ * @returns the parsed HTML element result, or `null` otherwise
+ * @since 1.1.0
+ */
+export function parse_element(source: string): ElementParseResult | null {
+	const start_result = parse_tag_start(source);
+
+	if (!start_result) {
+		return null;
+	}
+
+	let skip_length = start_result.length;
+	const element = start_result.node;
+
+	if (!start_result.self_closing && !element.tag.self_closing) {
+		// Not a self-closing tag, parse inside.
+		skip_length += parse_html(source.substring(start_result.length), element);
+	}
+
+	return {
+		element: element,
+		length: skip_length
+	};
 }
 
 const TAG_END_REGEX = /^\s*<\/\s*([^<>\s]+)\s*\>/;
@@ -224,16 +271,11 @@ function parse_html(source: string, parent: Element): number {
 	while (i < source.length) {
 		if (source.codePointAt(i) === TAG_START_CODE_POINT) {
 			const sub_source = source.substring(i);
-			const result = parse_tag_start(sub_source);
+			const result = parse_element(sub_source);
 
 			if (result) {
-				let skip_length = result.length;
-				const element = result.node;
-
-				if (!result.self_closing && !element.tag.self_closing) {
-					// Not a self-closing tag, parse inside.
-					skip_length += parse_html(source.substring(i + result.length), element);
-				}
+				const skip_length = result.length;
+				const element = result.element;
 
 				parent.append_child(element);
 

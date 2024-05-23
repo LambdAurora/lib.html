@@ -43,6 +43,14 @@
 export * from "./lib/tree.ts";
 export * from "./lib/text.ts";
 export * from "./lib/attribute.ts";
-export * from "./lib/element.ts";
+export {
+	create_element,
+	Element,
+	ImageElement,
+	LinkElement,
+	type NamedTagData,
+	Tag,
+	type TagData
+} from "./lib/element.ts";
 export * from "./lib/html.ts";
 export * from "./lib/utils.ts";

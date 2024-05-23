@@ -68,7 +68,7 @@ export interface NamedTagData<El extends Element> extends TagData<El> {
 	name: string;
 }
 
-function make_tag<El extends Element>(name: string, options: Partial<TagData<El>> = {}): Readonly<NamedTagData<El>> {
+export function make_tag<El extends Element>(name: string, options: Partial<TagData<El>> = {}): Readonly<NamedTagData<El>> {
 	const complete_options = merge_objects({
 		required_attributes: Object.freeze([]),
 		self_closing: false,
@@ -234,7 +234,7 @@ type StyleResult<V extends StyleValue> = V extends (string | number) ? Element :
 /**
  * Represents an HTML element, with a tag, attributes, and possibly children.
  *
- * @version 1.0.0
+ * @version 1.1.0
  * @since 1.0.0
  */
 export class Element extends Node {
@@ -684,7 +684,13 @@ export class Element extends Node {
 					result += elem_html.trimStart();
 				} else if (!allow_element_indent) {
 					result += elem_html.trimStart();
-				} else result += elem_html;
+				} else {
+					if (pretty && !result.endsWith("\n")) {
+						// If we prettify and indent the child element, we ensure that there's a new line for it.
+						result += "\n";
+					}
+					result += elem_html;
+				}
 
 				if ((look_ahead instanceof Text && get_leading_spaces(look_ahead.content) !== 0) || !(look_ahead instanceof Text)) {
 					result += separator;
