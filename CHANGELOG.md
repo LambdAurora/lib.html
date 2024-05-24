@@ -28,3 +28,7 @@
 ### 1.1.1
 
 - Fixed HTML stringification inserting too many new lines.
+
+### 1.1.2
+
+- Fixed HTML parsing disregarding strays `<` characters.

@@ -303,6 +303,14 @@ function parse_html(source: string, parent: Element): number {
 						parent.append_child(comment_result.comment);
 
 						continue;
+					} else {
+						const last_child = parent.children[parent.children.length - 1];
+
+						if (last_child instanceof Text) {
+							last_child.content += "<";
+						} else {
+							parent.append_child(new Text("<"));
+						}
 					}
 				}
 			}
@@ -310,7 +318,14 @@ function parse_html(source: string, parent: Element): number {
 			const text_result = parse_text(source, i, parent);
 
 			if (text_result) {
-				parent.append_child(text_result.text);
+				const last_child = parent.children[parent.children.length - 1];
+
+				if (last_child instanceof Text) {
+					last_child.content += text_result.text.content;
+				} else {
+					parent.append_child(text_result.text);
+				}
+
 				i += text_result.end;
 				continue;
 			}
