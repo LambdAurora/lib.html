@@ -1,7 +1,7 @@
 # lib.html
 
 <p align="center">
-	<img src="https://img.shields.io/badge/language-TS-9B599A.svg?style=flat-square" alt="JS" />
+	<img src="https://img.shields.io/badge/language-TS-9B599A.svg?style=flat-square" alt="Language: TypeScript" />
 	<a href="https://raw.githubusercontent.com/LambdAurora/lib.html/main/LICENSE"><img src="https://img.shields.io/badge/license-MPL%202.0-blue.svg?style=flat-square" alt="GitHub license" /></a>
 	<a href="https://jsr.io/@lambdaurora/libhtml"><img src="https://jsr.io/badges/@lambdaurora/libhtml?style=flat-square" alt="JSR badge" /></a>
 	<img src="https://shields.io/github/v/tag/LambdAurora/lib.html?sort=semver&style=flat-square" />
