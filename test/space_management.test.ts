@@ -43,3 +43,43 @@ Deno.test("html/output/proper_wrapping/nested_elements", () => {
 </div>`
 	);
 });
+
+function make_item(name: string, text: string): html.Element {
+	return html.create_element("li")
+		.with_attr("id", `fn:${name}`)
+		.with_child(text + " ")
+		.with_child(html.create_element("a")
+			.with_attr("class", "footnote_src_link")
+			.with_attr("href", `#fn:${name}:src`)
+			.with_child("↩")
+		);
+}
+
+Deno.test("html/output/proper_wrapping/list", () => {
+	const list = html.create_element("ol")
+		.with_attr("class", "footnotes")
+		.with_child(make_item("1", "Simple text"))
+		.with_child(make_item("fance-name", "Fancy name footnote."))
+		.with_child(make_item("3", "Moar text"))
+		.with_child(html.create_element("li")
+			.with_child("Simple")
+		);
+
+	list.purge_blank_children();
+
+	assertEquals(list.html(), /*html*/ `<ol class="footnotes">
+	<li id="fn:1">
+		Simple text
+		<a class="footnote_src_link" href="#fn:1:src">↩</a>
+	</li>
+	<li id="fn:fance-name">
+		Fancy name footnote.
+		<a class="footnote_src_link" href="#fn:fance-name:src">↩</a>
+	</li>
+	<li id="fn:3">
+		Moar text
+		<a class="footnote_src_link" href="#fn:3:src">↩</a>
+	</li>
+	<li>Simple</li>
+</ol>`)
+});

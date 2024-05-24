@@ -41,3 +41,8 @@
 
 - Added `stringify_tag_start` function.
 - Fixed some prettification issues.
+
+### 1.2.1
+
+- Improved prettification of lists and tables.
+- Fixed missing pretty condition to insert new lines in `inner_html`.

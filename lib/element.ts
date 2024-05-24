@@ -48,9 +48,23 @@ export interface TagData<El extends Element> {
 	preserve_format: boolean;
 	/**
 	 * `true` if elements using this tag can be inlined, or `false` otherwise.
+	 *
 	 * This is a hint for stringification.
 	 */
 	inline: boolean;
+	/**
+	 * `true` if elements using this tag can be safely be un-inlined, or `false` otherwise.
+	 *
+	 * This is a hint for stringification.
+	 */
+	loosely_inline: boolean;
+	/**
+	 * `true` if this block has a strong meaning and its children can be safely put on their own lines,
+	 * or `false` otherwise.
+	 *
+	 * This is a hint for stringification.
+	 */
+	strong_block: boolean;
 	/**
 	 * Creates a new instance of the element associated with this tag.
 	 *
@@ -77,6 +91,8 @@ export function make_tag<El extends Element>(name: string, options: Partial<TagD
 		escape_inside: true,
 		preserve_format: false,
 		inline: true,
+		loosely_inline: false,
+		strong_block: false,
 		create: function () {
 			return new Element(this as NamedTagData<El>) as El;
 		}
@@ -150,7 +166,7 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	kbd: make_tag("kbd"),
 	label: make_tag("label"),
 	legend: make_tag("legend"),
-	li: make_tag("li"),
+	li: make_tag("li", { loosely_inline: true }),
 	link: make_tag("link", {self_closing: true}),
 	main: make_tag("main", {inline: false}),
 	map: make_tag("map", {inline: false}),
@@ -159,7 +175,7 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	meter: make_tag("meter"),
 	nav: make_tag("nav", {inline: false}),
 	noscript: make_tag("noscript", {inline: false}),
-	ol: make_tag("ol", {inline: false}),
+	ol: make_tag("ol", { inline: false, strong_block: true }),
 	optgroup: make_tag("optgroup", {inline: false}),
 	option: make_tag("option"),
 	output: make_tag("output"),
@@ -186,20 +202,20 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	summary: make_tag("summary"),
 	sup: make_tag("sup"),
 	svg: make_tag("svg", {inline: false}),
-	table: make_tag("table", {inline: false}),
-	tbody: make_tag("tbody", {inline: false}),
-	td: make_tag("td"),
+	table: make_tag("table", { inline: false, strong_block: true }),
+	tbody: make_tag("tbody", { inline: false, strong_block: true }),
+	td: make_tag("td", { loosely_inline: true }),
 	template: make_tag("template"),
 	textarea: make_tag("textarea"),
-	tfoot: make_tag("tfoot", {inline: false}),
-	th: make_tag("th"),
-	thead: make_tag("thead", {inline: false}),
+	tfoot: make_tag("tfoot", { inline: false, strong_block: true }),
+	th: make_tag("th", { loosely_inline: true }),
+	thead: make_tag("thead", { inline: false, strong_block: true }),
 	time: make_tag("time"),
 	title: make_tag("title"),
-	tr: make_tag("tr", {inline: false}),
+	tr: make_tag("tr", { inline: false, strong_block: true }),
 	track: make_tag("track", {self_closing: true}),
 	u: make_tag("u"),
-	ul: make_tag("ul", {inline: false}),
+	ul: make_tag("ul", { inline: false, strong_block: true }),
 	var: make_tag("var"),
 	video: make_tag("video", {inline: false}),
 	wbr: make_tag("wbr", {self_closing: true}),
@@ -584,6 +600,11 @@ export class Element extends Node {
 	 * @private
 	 */
 	private can_insert_separator(current_index: number): boolean {
+		// Inside an element that is a strong block we can guarantee new lines for every children.
+		if (this.tag.strong_block) {
+			return true;
+		}
+
 		for (let i = current_index + 1; i < this.children.length; i++) {
 			const look_ahead = this.children[i];
 
@@ -648,7 +669,18 @@ export class Element extends Node {
 					result += "\n";
 				}
 
-				result += this.inner_html(indent);
+				const inner = this.inner_html(indent);
+
+				// In the case of list items, we can safely prettify them.
+				const should_force_inner_new_lines = pretty
+					&& this.tag.loosely_inline
+					&& (inner.includes("\n") || inner.length > 180);
+
+				if (should_force_inner_new_lines) {
+					result += "\n" + indent.indent_value + inner.trimStart();
+				} else {
+					result += inner;
+				}
 
 				if (pretty) {
 					const trailing_spaces = get_trailing_spaces(result);
@@ -656,7 +688,7 @@ export class Element extends Node {
 					// If we have trailing spaces we can simplify them into a new line.
 					if (trailing_spaces) {
 						result = result.substring(0, result.length - trailing_spaces) + `\n${style.indent_value}`;
-					} else if (!this.tag.inline) {
+					} else if (!this.tag.inline || should_force_inner_new_lines) {
 						// Or if this element isn't an inline element, then we can put the end tag on a new line.
 						result += `\n${style.indent_value}`;
 					} else {
@@ -734,7 +766,7 @@ export class Element extends Node {
 					result += elem_html;
 				}
 
-				if (this.can_insert_separator(i)) {
+				if (pretty && this.can_insert_separator(i)) {
 					result += separator;
 				}
 
