@@ -50,7 +50,8 @@ export {
 	LinkElement,
 	type NamedTagData,
 	Tag,
-	type TagData
+	type TagData,
 } from "./lib/element.ts";
-export * from "./lib/html.ts";
+export * from "./lib/parser.ts";
+export * from "./lib/stringify.ts";
 export * from "./lib/utils.ts";

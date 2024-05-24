@@ -16,10 +16,11 @@
 
 // deno-lint-ignore-file no-explicit-any
 import { type Attribute, type AttributeClass, type AttributeValue, create_attribute } from "./attribute.ts";
+import { stringify_start_tag } from "./stringify.ts";
+import { StringifyStyle } from "./stringify.ts";
 import { Comment, Text } from "./text.ts";
 import { Node } from "./tree.ts";
 import { get_leading_spaces, get_trailing_spaces, merge_objects } from "./utils.ts";
-import { StringifyStyle } from "./html.ts";
 
 /**
  * Represents the data associated with an HTML tag.
@@ -234,7 +235,7 @@ type StyleResult<V extends StyleValue> = V extends (string | number) ? Element :
 /**
  * Represents an HTML element, with a tag, attributes, and possibly children.
  *
- * @version 1.1.0
+ * @version 1.2.0
  * @since 1.0.0
  */
 export class Element extends Node {
@@ -536,6 +537,12 @@ export class Element extends Node {
 		});
 	}
 
+	/**
+	 * Attempts to find the first relevant text child of this element.
+	 *
+	 * @returns the first relevant text child, or `undefined` otherwise
+	 * @private
+	 */
 	private get_first_relevant_text_child(): Text | undefined {
 		for (const child of this.children) {
 			if (child instanceof Text) {
@@ -548,6 +555,12 @@ export class Element extends Node {
 		return undefined;
 	}
 
+	/**
+	 * Attempts to find the last relevant text child of this element.
+	 *
+	 * @returns the last relevant text child, or `undefined` otherwise
+	 * @private
+	 */
 	private get_last_relevant_text_child(): Text | undefined {
 		for (let i = this.children.length - 1; i >= 0; i--) {
 			const child = this.children[i];
@@ -563,6 +576,59 @@ export class Element extends Node {
 	}
 
 	/**
+	 * Returns whether the next child after the given current child is significant and should
+	 * prevent space insertion.
+	 *
+	 * @param current_index the current child index
+	 * @returns `true` if the next child can be separated by a new line, or `false` otherwise
+	 * @private
+	 */
+	private can_insert_separator(current_index: number): boolean {
+		for (let i = current_index + 1; i < this.children.length; i++) {
+			const look_ahead = this.children[i];
+
+			if (look_ahead instanceof Text) {
+				return get_leading_spaces(look_ahead.content) !== 0;
+			} else if (look_ahead instanceof Element) {
+				if (!look_ahead.tag.inline) {
+					return true;
+				} else {
+					const text_look_ahead = look_ahead.get_first_relevant_text_child();
+
+					if (text_look_ahead && get_leading_spaces(text_look_ahead.content) !== 0) {
+						return true;
+					} else {
+						return false;
+					}
+				}
+			}
+			
+		}
+
+		return false;
+	}
+
+	private can_indent_first_child(): boolean {
+		if (!this.tag.inline) {
+			// This element isn't an inline element, we can freely use new lines.
+			return true;
+		} else {
+			// Otherwise we look for the first relevant text child and see if it has leading spaces,
+			// if it does then we can insert a new line without altering the meaning of the HTML tree.
+			const relevant_child = this.get_first_relevant_text_child();
+
+			if (
+				relevant_child?.content === undefined
+				|| get_leading_spaces(relevant_child.content) !== 0
+			) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * Returns the outer HTML string of this element.
 	 *
 	 * @param style the HTML string style
@@ -571,39 +637,15 @@ export class Element extends Node {
 	public override html(style: StringifyStyle = new StringifyStyle("\t")): string {
 		// Can we prettify the output?
 		const pretty = style.is_pretty() && !this.tag.preserve_format;
-		let result = `${style.indent_value}<${this.tag.name}`;
+		let result = style.indent_value + stringify_start_tag(this);
 
-		// Add attributes to output.
-		if (this.attributes.length > 0) {
-			result += " " + this.attributes.map(attr => attr.html()).join(" ");
-		}
-
-		if (this.children.length === 0 && this.tag.self_closing) {
-			// This element is self-closing, we can stop here.
-			if (this.tag.name === Tag["!doctype"].name) result += ">"; // !DOCTYPE is a special child.
-			else result += " />";
-		} else {
-			result += ">";
-
+		if (!this.tag.self_closing) {
 			if (this.children.length > 0) {
 				const indent = pretty ? style.indent() : new StringifyStyle("");
 
-				if (pretty) {
-					if (!this.tag.inline) {
-						// This element isn't an inline element, we can freely use new lines.
-						result += "\n";
-					} else {
-						// Otherwise we look for the first relevant text child and see if it has leading spaces,
-						// if it does then we can insert a new line without altering the meaning of the HTML tree.
-						const relevant_child = this.get_first_relevant_text_child();
-
-						if (
-							relevant_child?.content === undefined
-							|| get_leading_spaces(relevant_child.content) !== 0
-						) {
-							result += "\n";
-						}
-					}
+				if (pretty && this.can_indent_first_child()) {
+					// We can use a new line to allow the first child to be indented.
+					result += "\n";
 				}
 
 				result += this.inner_html(indent);
@@ -680,7 +722,7 @@ export class Element extends Node {
 				const relevant_text = child.get_first_relevant_text_child();
 				const elem_html = child.html(style);
 
-				if (!result.endsWith("\n") && this.tag.inline && relevant_text && get_leading_spaces(relevant_text.content) === 0) {
+				if (!result.endsWith("\n") && (i !== 0 || !this.can_indent_first_child()) && relevant_text && get_leading_spaces(relevant_text.content) === 0) {
 					result += elem_html.trimStart();
 				} else if (!allow_element_indent) {
 					result += elem_html.trimStart();
@@ -692,7 +734,7 @@ export class Element extends Node {
 					result += elem_html;
 				}
 
-				if ((look_ahead instanceof Text && get_leading_spaces(look_ahead.content) !== 0) || !(look_ahead instanceof Text)) {
+				if (this.can_insert_separator(i)) {
 					result += separator;
 				}
 

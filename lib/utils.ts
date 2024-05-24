@@ -16,6 +16,9 @@
 
 // From https://www.w3.org/TR/xml-entity-names/2007/htmlmathml.json
 import HTML_ENTITIES from "./html_entities.json" with { type: "json" };
+import { Element } from "./element.ts";
+import { Comment, Text } from "./text.ts";
+import type { Node } from "./tree.ts";
 
 /**
  * Represents the non-breaking space character.
@@ -184,4 +187,48 @@ export function get_trailing_spaces(input: string): number {
 	}
 
 	return count;
+}
+
+/*
+ * HTML stuff
+ */
+
+type TagName = { name: string };
+
+/**
+ * Sanitizes recursively the given element(s).
+ *
+ * @param element the element(s) to sanitize
+ * @param disallowed_tags the tags that should be escaped
+ * @param extra extra custom sanitizer
+ * @returns the sanitized element(s)
+ */
+export function sanitize_elements<I extends (Node | Node[])>(
+	element: I,
+	disallowed_tags: readonly (string | TagName)[],
+	extra = (node: Node) => node
+): I {
+	const tags_to_remove = disallowed_tags.map(tag => typeof tag === "string" ? tag : tag.name) as string[];
+
+	function execute(el: Node | Node[]) {
+		if (el instanceof Array) {
+			for (let i = 0; i < el.length; i++) {
+				el[i] = execute(el[i]) as Node;
+			}
+		} else if (el instanceof Element) {
+			if (tags_to_remove.includes(el.tag.name)) {
+				return new Text(decode_html(el.html()));
+			} else {
+				execute(el.children);
+				return extra(el);
+			}
+		}
+
+		return el;
+	}
+
+	if (element instanceof Element || element instanceof Text || element instanceof Comment)
+		return (execute([element]) as Node[])[0] as I;
+	else
+		return execute(element) as I;
 }

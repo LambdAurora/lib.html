@@ -36,3 +36,8 @@
 ### 1.1.3
 
 - Fixed broken `parse_nodes` function.
+
+## 1.2.0
+
+- Added `stringify_tag_start` function.
+- Fixed some prettification issues.

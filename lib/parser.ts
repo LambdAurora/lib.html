@@ -9,7 +9,7 @@
  */
 
 /**
- * This module contains definition related to parsing and stringification of HTML.
+ * This module contains definition related to the parsing of HTML.
  *
  * @module
  */
@@ -17,115 +17,7 @@
 import type { Node } from "./tree.ts";
 import { decode_html, TAG_END_CODE_POINT, TAG_START_CODE_POINT } from "./utils.ts";
 import { Comment, Text } from "./text.ts";
-import { create_element, Element, make_tag } from "./element.ts";
-
-/*
- * Render
- */
-
-/**
- * Represents a utility to assist in the stringification process of the HTML tree.
- *
- * @version 1.0.0
- * @since 1.0.0
- */
-export class StringifyStyle {
-	constructor(public readonly indent_char: string, public readonly level: number = 0) {
-	}
-
-	/**
-	 * Returns whether this stringify style is considered a prettified string output.
-	 *
-	 * @returns `true` if this stringify style is pretty, or `false` otherwise
-	 */
-	public is_pretty(): boolean {
-		return this.indent_char !== "";
-	}
-
-	/**
-	 * Indents of a given amount this stringify style.
-	 *
-	 * @param amount the amount to indent
-	 * @returns the indented stringify style
-	 */
-	public indent(amount: number = 1): StringifyStyle {
-		return new StringifyStyle(this.indent_char, this.level + amount);
-	}
-
-	/**
-	 * The indentation value of this stringify style.
-	 */
-	public get indent_value(): string {
-		return this.is_pretty() ? this.indent_char.repeat(this.level) : "";
-	}
-}
-
-/**
- * Stringifies the given node.
- *
- * @param node the node to stringify
- * @param style the style of stringification
- * @returns the HTML node as an HTML string
- */
-export function stringify(node: Node, style: StringifyStyle = new StringifyStyle("\n")): string {
-	if (node instanceof Text) {
-		return node.html();
-	} else if (node instanceof Comment) {
-		return node.html();
-	} else if (node instanceof Element) {
-		return node.html(style);
-	} else {
-		throw new Error("Not a valid node.");
-	}
-}
-
-/*
- * Utils
- */
-
-type TagName = { name: string };
-
-/**
- * Sanitizes recursively the given element(s).
- *
- * @param element the element(s) to sanitize
- * @param disallowed_tags the tags that should be escaped
- * @param extra extra custom sanitizer
- * @returns the sanitized element(s)
- */
-export function sanitize_elements<I extends (Node | Node[])>(
-	element: I,
-	disallowed_tags: readonly (string | TagName)[],
-	extra = (node: Node) => node
-): I {
-	const tags_to_remove = disallowed_tags.map(tag => typeof tag === "string" ? tag : tag.name) as string[];
-
-	function execute(el: Node | Node[]) {
-		if (el instanceof Array) {
-			for (let i = 0; i < el.length; i++) {
-				el[i] = execute(el[i]) as Node;
-			}
-		} else if (el instanceof Element) {
-			if (tags_to_remove.includes(el.tag.name)) {
-				return new Text(decode_html(stringify(el)));
-			} else {
-				execute(el.children);
-				return extra(el);
-			}
-		}
-
-		return el;
-	}
-
-	if (element instanceof Element || element instanceof Text || element instanceof Comment)
-		return (execute([element]) as Node[])[0] as I;
-	else
-		return execute(element) as I;
-}
-
-/*
- * Parser
- */
+import { create_element, type Element, make_tag } from "./element.ts";
 
 const END_TAG = make_tag("parse end");
 
