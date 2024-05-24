@@ -50,3 +50,7 @@
 ### 1.2.2
 
 - Fixed bad HTML text encoding and decoding inside of `<script>` or `<style>` elements.
+
+### 1.2.3
+
+- Fixed bad stringification of space-sensitive elements which changed the meaning of the HTML tree.

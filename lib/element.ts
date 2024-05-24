@@ -156,7 +156,7 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	h6: make_tag("h6"),
 	head: make_tag("head", {inline: false}),
 	header: make_tag("header", {inline: false}),
-	hr: make_tag("hr", {self_closing: true}),
+	hr: make_tag("hr", { self_closing: true, strong_block: true }),
 	html: make_tag("html", {inline: false}),
 	i: make_tag("i"),
 	iframe: make_tag("iframe", {inline: false}),
@@ -564,7 +564,11 @@ export class Element extends Node {
 			if (child instanceof Text) {
 				return child;
 			} else if (child instanceof Element) {
-				return child.get_first_relevant_text_child();
+				const found = child.get_first_relevant_text_child();
+
+				if (found) {
+					return found;
+				}
 			}
 		}
 
@@ -765,15 +769,22 @@ export class Element extends Node {
 				const relevant_text = child.get_first_relevant_text_child();
 				const elem_html = child.html(style);
 
-				if (!result.endsWith("\n") && (i !== 0 || !this.can_indent_first_child()) && relevant_text && get_leading_spaces(relevant_text.content) === 0) {
+				if (!allow_element_indent) {
 					result += elem_html.trimStart();
-				} else if (!allow_element_indent) {
-					result += elem_html.trimStart();
-				} else {
-					if (pretty && i !== 0 && !result.endsWith("\n")) {
+				} else if (pretty) {
+					const has_new_line = result.endsWith("\n");
+
+					if (!this.tag.inline && i !== 0 && !has_new_line &&
+						((relevant_text && get_leading_spaces(relevant_text.content) !== 0) || child.tag.strong_block)
+					) {
 						// If we prettify and indent the child element, we ensure that there's a new line for it.
-						result += "\n";
+						result += "\n" + elem_html;
+					} else if (!has_new_line && (i !== 0 || !this.can_indent_first_child())) {
+						result += elem_html.trimStart();
+					} else {
+						result += elem_html;
 					}
+				} else {
 					result += elem_html;
 				}
 

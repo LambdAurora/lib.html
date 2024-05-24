@@ -83,3 +83,9 @@ Deno.test("html/output/proper_wrapping/list", () => {
 	<li>Simple</li>
 </ol>`)
 });
+
+Deno.test("html/output/proper_wrapping/latex_example", () => {
+	const text = /*html*/ `<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right: 0.2222em;"></span><span class="mbin">∪</span><span class="mspace" style="margin-right: 0.2222em;"></span></span><span class="base"><span class="strut" style="height: 0.7073em; vertical-align: -0.024em;"></span><span class="mord mathnormal" style="margin-right: 0.05017em;">B</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mrel">⟹</span><span class="mspace" style="margin-right: 0.2778em;"></span><span class="mspace" style="margin-right: 0.2778em;"></span></span><span class="base"><span class="strut" style="height: 0.6833em;"></span><span class="mord mathnormal" style="margin-right: 0.13889em;">P</span></span></span></span>`;
+	const element = html.parse_element(text)!.element;
+	assertEquals(element.html(), text);
+});
