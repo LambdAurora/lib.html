@@ -715,6 +715,17 @@ export class Element extends Node {
 	 * @returns the inner HTML string
 	 */
 	public inner_html(style: StringifyStyle = new StringifyStyle("\t", 0)): string {
+		if (!this.tag.parse_inside) {
+			// This means we should NOT touch anything inside this element.
+			return this.children.map(child => {
+				if (child instanceof Comment) {
+					return child.html();
+				} else {
+					return child.text();
+				}
+			}).join("");
+		}
+
 		// Can we prettify the output?
 		const pretty = style.is_pretty() && !this.tag.preserve_format;
 		let look_behind: Node | null = null;

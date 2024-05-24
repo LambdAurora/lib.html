@@ -46,3 +46,7 @@
 
 - Improved prettification of lists and tables.
 - Fixed missing pretty condition to insert new lines in `inner_html`.
+
+### 1.2.2
+
+- Fixed bad HTML text encoding and decoding inside of `<script>` or `<style>` elements.

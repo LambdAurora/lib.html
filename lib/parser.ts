@@ -143,8 +143,15 @@ function parse_text(source: string, start: number, parent: Element): TextParseRe
 	if (end !== -1) {
 		const length = end + 1;
 		if (length !== 1) end++;
+
+		let text = source.substring(start, start + length);
+
+		if (parent.tag.parse_inside) {
+			text = decode_html(text);
+		}
+
 		return {
-			text: new Text(decode_html(source.substring(start, start + length))),
+			text: new Text(text),
 			end: Math.max(1, end)
 		};
 	} else {
