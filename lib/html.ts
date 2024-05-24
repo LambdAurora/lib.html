@@ -140,6 +140,7 @@ export function parse_nodes(source: string): Node[] {
 
 	parse_html(source, {
 		tag: END_TAG,
+		children: nodes,
 		append_child: (node: Node) => nodes.push(node)
 	} as unknown as Element);
 

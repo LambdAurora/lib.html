@@ -32,3 +32,7 @@
 ### 1.1.2
 
 - Fixed HTML parsing disregarding strays `<` characters.
+
+### 1.1.3
+
+- Fixed broken `parse_nodes` function.
