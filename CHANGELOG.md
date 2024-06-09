@@ -54,3 +54,7 @@
 ### 1.2.3
 
 - Fixed bad stringification of space-sensitive elements which changed the meaning of the HTML tree.
+
+## 1.3.0
+
+- Added a Flutter-like sugar syntax for building HTML trees ([#1](https://github.com/LambdAurora/lib.html/issues/1)).

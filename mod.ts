@@ -35,6 +35,19 @@
  * 	);
  *
  * const html_string = alert.html();
+ * 
+ * const dialog = html.dialog({
+ * 	children: [
+ * 		html.h1(["Hello world!"]),
+ * 		html.p(["I hope you have a wonderful day!"]),
+ * 		html.button(["Thank you"])
+ * 	],
+ * 	attributes: {
+ * 		open: ""
+ * 	}
+ * });
+ *
+ * const other_html_string = dialog.html();
  * ```
  *
  * @module
@@ -54,4 +67,5 @@ export {
 } from "./lib/element.ts";
 export * from "./lib/parser.ts";
 export * from "./lib/stringify.ts";
+export * from "./lib/sugar.ts";
 export * from "./lib/utils.ts";

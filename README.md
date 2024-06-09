@@ -34,6 +34,19 @@ const alert = html.create_element("div")
 	);
 
 const html_string = alert.html();
+
+const dialog = html.dialog({
+	children: [
+		html.h1(["Hello world!"]),
+		html.p(["I hope you have a wonderful day!"]),
+		html.button(["Thank you"])
+	],
+	attributes: {
+		open: ""
+	}
+});
+
+const other_html_string = dialog.html();
 ```
 
 ## Usage
@@ -57,5 +70,5 @@ import * as html from "@lambdaurora/libhtml";
 Import the library using [esm.sh](https://esm.sh):
 
 ```javascript
-import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.2.3";
+import * as html from "https://esm.sh/jsr/@lambdaurora/libhtml@1.3.0";
 ```

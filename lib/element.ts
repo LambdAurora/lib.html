@@ -193,6 +193,7 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	script: make_tag("script", {parse_inside: false, preserve_format: true, escape_inside: false, inline: false}),
 	section: make_tag("section", {inline: false}),
 	select: make_tag("select", {inline: false}),
+	slot: make_tag("slot"),
 	small: make_tag("small"),
 	source: make_tag("source", {self_closing: true}),
 	span: make_tag("span"),
@@ -221,8 +222,8 @@ export const Tag: Readonly<{ [key: string]: Readonly<NamedTagData<Element>> }> =
 	wbr: make_tag("wbr", {self_closing: true}),
 });
 
-type CreateElementIn<El extends Element> = string | NamedTagData<El>;
-type CreateElementOut<El extends Element, I extends CreateElementIn<El>> = I extends "a" ? LinkElement : I extends "img" ? ImageElement : El;
+export type CreateElementIn<El extends Element> = string | NamedTagData<El>;
+export type CreateElementOut<El extends Element, I extends CreateElementIn<El>> = I extends "a" ? LinkElement : I extends "img" ? ImageElement : El;
 
 /**
  * Creates an HTML element instance based on the given tag name.
@@ -245,7 +246,7 @@ export function create_element<El extends Element, I extends CreateElementIn<El>
 	return actual_tag.create() as CreateElementOut<El, I>;
 }
 
-type StyleValue = string | number | undefined;
+export type StyleValue = string | number | undefined;
 type StyleResult<V extends StyleValue> = V extends (string | number) ? Element : (string | number | null);
 
 /**
