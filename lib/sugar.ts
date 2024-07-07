@@ -46,8 +46,12 @@ function with_children<El extends Element, I extends CreateElementIn<El>>(
 			for (const child of input.children) elem.append_child(child);
 		}
 		if (input?.attributes) {
-			// deno-lint-ignore no-explicit-any
-			for (const [key, attr] of Object.entries(input.attributes)) elem.attr(key, attr as any);
+			for (const [key, attr] of Object.entries(input.attributes)) {
+				if (attr !== undefined) {
+					// deno-lint-ignore no-explicit-any
+					elem.attr(key, attr as any);
+				}
+			}
 		}
 		if (input?.style) {
 			for (const [key, value] of Object.entries(input.style)) elem.style(key, value);

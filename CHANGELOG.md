@@ -58,3 +58,7 @@
 ## 1.3.0
 
 - Added a Flutter-like sugar syntax for building HTML trees ([#1](https://github.com/LambdAurora/lib.html/issues/1)).
+
+### 1.3.1
+
+- Fixed wrongly-inserted attributes with undefined values using the sugar syntax.
