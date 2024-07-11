@@ -100,7 +100,7 @@ export function parse_element(source: string): ElementParseResult | null {
 }
 
 const TAG_END_REGEX = /^\s*<\/\s*([^<>\s]+)\s*\>/;
-const ATTRIBUTE_REGEX = /^\s*([^ \t\n\r"'>\/=]+)(?:\s*=\s*((?:[^"' \t\n\r<>`]+)|(?:'([^"]*?)')|(?:"([^']*?)")))?/;
+const ATTRIBUTE_REGEX = /^\s*([^ \t\n\r"'>\/=]+)(?:\s*=\s*((?:[^"' \t\n\r<>`]+)|(?:'([^']*?)')|(?:"([^"]*?)")))?/;
 const COMMENT_END_REGEX = /-->/;
 
 interface TextParseResult {

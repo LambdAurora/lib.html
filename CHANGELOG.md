@@ -62,3 +62,7 @@
 ### 1.3.1
 
 - Fixed wrongly-inserted attributes with undefined values using the sugar syntax.
+
+### 1.3.2
+
+- Fixed attribute value parsing not allowing some delimiters as value.
